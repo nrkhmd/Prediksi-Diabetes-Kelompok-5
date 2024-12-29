@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediksi Diabetes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Eksplorasi Data Mining untuk Prediksi Diabetes</h1>
+        <form id="predictionForm">
+            <input type="number" id="pregnancies" placeholder="Input nilai Pregnancies" required>
+            <input type="number" id="glucose" placeholder="Input nilai Glucose" required>
+            <input type="number" id="bloodPressure" placeholder="Input nilai Blood Pressure" required>
+            <input type="number" id="skinThickness" placeholder="Input nilai Skin Thickness" required>
+            <input type="number" id="insulin" placeholder="Input nilai Insulin" required>
+            <input type="number" id="bmi" placeholder="Input nilai BMI" required>
+            <input type="number" id="diabetesPedigreeFunction" placeholder="Input nilai Diabetes Pedigree Function" required>
+            <input type="number" id="age" placeholder="Input nilai Age" required>
+            <button type="button" onclick="predictDiabetes()">Test Prediksi</button>
+        </form>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        async function predictDiabetes() {
+            const inputs = {
+                pregnancies: parseFloat(document.getElementById('pregnancies').value),
+                glucose: parseFloat(document.getElementById('glucose').value),
+                bloodPressure: parseFloat(document.getElementById('bloodPressure').value),
+                skinThickness: parseFloat(document.getElementById('skinThickness').value),
+                insulin: parseFloat(document.getElementById('insulin').value),
+                bmi: parseFloat(document.getElementById('bmi').value),
+                diabetesPedigreeFunction: parseFloat(document.getElementById('diabetesPedigreeFunction').value),
+                age: parseFloat(document.getElementById('age').value)
+            };
+
+            // Fetch model and make prediction
+            try {
+                const model = await tf.loadLayersModel('model/diabetes_model.json');
+                const inputTensor = tf.tensor2d([
+                    [
+                        inputs.pregnancies,
+                        inputs.glucose,
+                        inputs.bloodPressure,
+                        inputs.skinThickness,
+                        inputs.insulin,
+                        inputs.bmi,
+                        inputs.diabetesPedigreeFunction,
+                        inputs.age
+                    ]
+                ]);
+
+                const prediction = model.predict(inputTensor);
+                const result = prediction.dataSync()[0];
+                document.getElementById('result').innerText = result >= 0.5 ?
+                    'Pasien terkena diabetes' : 'Pasien tidak terkena diabetes';
+            } catch (error) {
+                console.error(error);
+                document.getElementById('result').innerText = 'Error during prediction';
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+</body>
+</html>
+
